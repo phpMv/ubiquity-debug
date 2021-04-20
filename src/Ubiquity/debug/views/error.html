@@ -1,0 +1,19 @@
+<div class="ui icon attached error message">
+	<i class="bug red circular icon"></i>
+	<div class="content">
+		<div class="header">
+			{{type}} at line <b>{{line}}</b>
+		</div>
+		<p>{{error}}</p>
+	</div>
+</div>
+<div class="ui attached segment">
+	<h3 class="ui header">
+		<i class="file alternate icon"></i>
+		<div class="content">{{controller_action}}<div class="sub header">{{file}}</div></div>
+	</h3>
+	<pre class="line-numbers linkable-line-numbers" data-line="{{line}}" data-start="{{start}}"><code class="language-php">{{code}}</code></pre>
+	{{traces}}
+	{{vars}}
+</div>
+
