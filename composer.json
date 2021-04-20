@@ -1,17 +1,17 @@
 {
-	"name" : "phpmv/ubiquity-dev",
-	"description" : "dev classes for Ubiquity framework",
+	"name" : "phpmv/ubiquity-debug",
+	"description" : "Debugger for Ubiquity framework",
 	"type" : "extension",
 	"keywords" : [
 		"php",
 		"framework",
 		"mvc",
 		"tools",
-		"mailer",
+		"debug",
 		"php-framework"
 	],
 	"require" : {
-		"php" : ">=7.4"
+		"php" : ">=8.0"
 	},
 	"license" : "Apache-2.0",
 	"authors" : [{
