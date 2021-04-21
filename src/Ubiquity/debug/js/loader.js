@@ -90,6 +90,7 @@
                 insertCSS("https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.7/dist/semantic.min.css");
                 insertJS("https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.7/dist/semantic.min.js");
             }
+            insertCSS('/assets/styles.css');
             if(typeof Prism === 'undefined') {
                 let root='/vendor/prismjs/prism/';
                 let cssRoot=root+'themes/';
@@ -102,7 +103,6 @@
                     insertJS(root+'components/prism-php.js');
                     insertJS(root+'plugins/line-numbers/prism-line-numbers.js');
                     insertJS(root+'plugins/line-highlight/prism-line-highlight.js');
-                    //insertJS(root+'plugins/autoloader/prism-autoloader.js');
                 });
 
             }
