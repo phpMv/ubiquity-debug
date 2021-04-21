@@ -26,12 +26,19 @@ class Debugger {
 	/**
 	 * Start the debugger.
 	 */
-	public static function start(){
+	public static function start(int $level=E_ALL){
 		\ob_start(array(
 			__class__,
 			'_error_handler'
 		));
-		
+		self::setErrorLevel($level);
+	}
+	
+	public static function setErrorLevel(int $level=E_ALL){
+		\error_reporting($level);
+		if($level>0){
+			\ini_set('display_errors', '1');
+		}
 	}
 
 	public static function _error_handler($buffer) {
