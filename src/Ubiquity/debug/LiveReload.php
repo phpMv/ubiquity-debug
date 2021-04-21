@@ -14,6 +14,11 @@ use Ubiquity\utils\http\URequest;
  *
  */
 class LiveReload {
+	/**
+	 * Add livereload webSocket.
+	 * @param int $port
+	 * @return string
+	 */
 	public static function start(int $port=35729):string{
 		if(!URequest::isAjax()) {
 			return '<script>document.write(\'<script src="http://\' + (location.host || \'localhost\').split(\':\')[0] +
@@ -21,8 +26,11 @@ class LiveReload {
 		}
 		return '';
 	}
-	
-	public static function isActive():bool{
+	/**
+	 * Check if Livereload js intallation.
+	 * @return bool
+	 */
+	public static function hasLiveReload():bool{
 		$exitCode=0;
 		\exec('livereload --version', $_, $exitCode);
 		return $exitCode == 1;
