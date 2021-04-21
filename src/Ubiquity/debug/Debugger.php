@@ -23,8 +23,11 @@ class Debugger {
 	const CONTEXT_VARIABLES=['globals'=>['_SESSION','_POST','_GET','_REQUEST','_SERVER','_COOKIE','_FILES','_ENV','__composer_autoload_files'],'toRemove'=>['e','config','sConfig']];
 	private static $variables=[];
 
-	public function __construct(){
-		ob_start(array(
+	/**
+	 * Start the debugger.
+	 */
+	public static function start(){
+		\ob_start(array(
 			__class__,
 			'_error_handler'
 		));
