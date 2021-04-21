@@ -96,23 +96,24 @@ class Debugger {
 
 	private static function getLocales(){
 		$variables=[];
-		$variables['controller']=Startup::getController();
-		$variables['action']=Startup::getAction();
-		$variables['params']=Startup::getActionParams();
+		$variables['Request']['controller']=Startup::getController();
+		$variables['Request']['action']=Startup::getAction();
+		$variables['Request']['params']=Startup::getActionParams();
+		$variables['Request']['method']=URequest::getMethod();
 		$path=Framework::getUrl();
-		$variables['url']=$path;
-		$variables['route']=Router::getRouteInfo($path);
-		$variables['cacheSystem']=Framework::getCacheSystem();
-		$variables['AnnotationsEngine']=Framework::getAnnotationsEngine();
-		$variables['applicationDir']=Startup::getApplicationDir();
-		$variables['Ubiquity-version']=Framework::getVersion();
+		$variables['Request']['url']=$path;
+		$variables['Route']=Router::getRouteInfo($path);
+		$variables['Application']['cacheSystem']=Framework::getCacheSystem();
+		$variables['Application']['AnnotationsEngine']=Framework::getAnnotationsEngine();
+		$variables['Application']['applicationDir']=Startup::getApplicationDir();
+		$variables['Application']['Ubiquity-version']=Framework::getVersion();
 		return $variables;
 	}
-
+	
 	private static function showAllVariables(){
 		$l=self::getLocales();
 		$g=self::getGlobales($GLOBALS);
-		$locales=self::showVariable('Context',$l,1);
+		$locales=self::showVariables($l);
 		$globales=self::showVariables($g);
 		return self::loadView('all_variables',compact('locales','globales'));
 	}
