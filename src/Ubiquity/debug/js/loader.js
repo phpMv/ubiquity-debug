@@ -90,7 +90,7 @@
                 insertCSS("https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.7/dist/semantic.min.css");
                 insertJS("https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.7/dist/semantic.min.js");
             }
-            insertCSS('/assets/styles.css');
+            insertCSS('/vendor/phpmv/ubiquity-debug/src/Ubiquity/debug/assets/styles.css');
             if(typeof Prism === 'undefined') {
                 let root='/vendor/prismjs/prism/';
                 let cssRoot=root+'themes/';

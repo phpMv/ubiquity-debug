@@ -255,7 +255,7 @@ class Debugger {
 	}
 
 	private static function loadView($name,$data){
-		$content=file_get_contents(__DIR__.'/views/'.$name.'.html');
+		$content=\file_get_contents(__DIR__.'/views/'.$name.'.html');
 		foreach ($data as $key=>$value){
 			$content=str_replace('{{'.$key.'}}',$value,$content);
 		}
