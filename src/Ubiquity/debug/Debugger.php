@@ -1,10 +1,7 @@
 <?php
-
-
 namespace Ubiquity\debug;
 
 
-use Ajax\semantic\html\collections\HtmlMessage;
 use Ubiquity\cache\ClassUtils;
 use Ubiquity\controllers\admin\popo\ComposerDependency;
 use Ubiquity\controllers\Startup;
@@ -14,9 +11,18 @@ use Ubiquity\utils\base\UIntrospection;
 use Ubiquity\utils\base\UString;
 use Ubiquity\utils\http\UResponse;
 
+/**
+ * Ubiquity debug class.
+ * Ubiquity\debug$Debugger
+ * This class is part of Ubiquity
+ * @author jc
+ * @version 1.0.0
+ *
+ */
 class Debugger {
 	const CONTEXT_VARIABLES=['globals'=>['_SESSION','_POST','_GET','_REQUEST','_SERVER','_COOKIE','_FILES','_ENV','__composer_autoload_files'],'toRemove'=>['e','config','sConfig']];
 	private static $variables=[];
+
 	public function __construct(){
 		ob_start(array(
 			__class__,
