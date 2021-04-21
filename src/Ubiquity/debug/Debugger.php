@@ -4,6 +4,7 @@ namespace Ubiquity\debug;
 
 use Ubiquity\cache\ClassUtils;
 use Ubiquity\controllers\admin\popo\ComposerDependency;
+use Ubiquity\controllers\Router;
 use Ubiquity\controllers\Startup;
 use Ubiquity\core\Framework;
 use Ubiquity\debug\core\TypeError;
@@ -20,7 +21,7 @@ use Ubiquity\utils\http\UResponse;
  *
  */
 class Debugger {
-	const CONTEXT_VARIABLES=['globals'=>['_SESSION','_POST','_GET','_REQUEST','_SERVER','_COOKIE','_FILES','_ENV','__composer_autoload_files'],'toRemove'=>['e','config','sConfig']];
+	const CONTEXT_VARIABLES=['globals'=>['_SESSION','_POST','_GET','_REQUEST','_SERVER','_COOKIE','_FILES','_ENV'],'toRemove'=>['e','config','sConfig']];
 	private static $variables=[];
 
 	/**
@@ -98,7 +99,9 @@ class Debugger {
 		$variables['controller']=Startup::getController();
 		$variables['action']=Startup::getAction();
 		$variables['params']=Startup::getActionParams();
-		$variables['route']=Framework::getUrl();
+		$path=Framework::getUrl();
+		$variables['url']=$path;
+		$variables['route']=Router::getRouteInfo($path);
 		$variables['cacheSystem']=Framework::getCacheSystem();
 		$variables['AnnotationsEngine']=Framework::getAnnotationsEngine();
 		$variables['applicationDir']=Startup::getApplicationDir();
