@@ -7,7 +7,7 @@ Debugger for Ubiquity framework
 # Integration
 ## For an existing project
 
-In `.ubiquity/index.php` file:
+In `.ubiquity/_index.php` file:
 
 ```php
 try {
@@ -22,7 +22,7 @@ In `app/config/services.php`:
 \Ubiquity\debug\Debugger::start();
 ```
 
-## For a new project (since Ubiquity 2.2.4)
+## For a new project (since Ubiquity 2.4.4)
 Nothing to do: The debugger is active by default with the php built-in server.
 
 ```bash
