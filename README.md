@@ -7,7 +7,11 @@ Debugger for Ubiquity framework
 # Integration
 ## For an existing project
 
-In `.ubiquity/_index.php` file:
+```bash
+composer require phpmv/ubiquity-debug
+```
+
+Update in `.ubiquity/_index.php` file:
 
 ```php
 \Ubiquity\debug\Debugger::start();
