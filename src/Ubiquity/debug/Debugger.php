@@ -10,6 +10,7 @@ use Ubiquity\core\Framework;
 use Ubiquity\debug\core\TypeError;
 use Ubiquity\utils\base\UIntrospection;
 use Ubiquity\utils\base\UString;
+use Ubiquity\utils\http\URequest;
 use Ubiquity\utils\http\UResponse;
 
 /**
@@ -161,6 +162,7 @@ class Debugger {
 
 	private static function showTrace($trace,$index){
 		$callFunction=$trace['function']??'';
+		$callMethod=null;
 		$line=$trace['line']??0;
 		$callClass=$trace['class']??'no class';
 		$args=$trace['args']??[];
@@ -232,12 +234,14 @@ class Debugger {
 		$controller_action=\basename($file);
 		if($introspect) {
 			$class = ClassUtils::getClassFullNameFromFile($file, true);
-			$controller_action=$class;
-			$method = UIntrospection::getMethodAtLine($class, $line);
-			if($method!=null){
-				$start=$method->getStartLine();
-				$code=UIntrospection::getMethodCode($method,file($file));
-				$controller_action.='::'.$method->getName();
+			if($class!==null) {
+				$controller_action = $class;
+				$method = UIntrospection::getMethodAtLine($class, $line);
+				if ($method != null) {
+					$start = $method->getStartLine();
+					$code = UIntrospection::getMethodCode($method, file($file));
+					$controller_action .= '::' . $method->getName();
+				}
 			}
 		}
 		if($code==null) {
