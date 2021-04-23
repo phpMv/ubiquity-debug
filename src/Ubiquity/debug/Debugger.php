@@ -28,9 +28,16 @@ class Debugger {
 	/**
 	 * Start the debugger.
 	 */
-	public static function start(int $level=E_ALL){
+	public static function start(&$config,int $level=E_ALL){
 		self::setErrorLevel($level);
 		if($level>0){
+			$config['onError']=function($code, $message = null, $controllerInstance = null) {
+				switch ($code){
+					case 404:case 500:
+						throw new \Exception($message);
+						break;
+				}
+			};
 			\ob_start(array(
 				__class__,
 				'_error_handler'
@@ -211,7 +218,7 @@ class Debugger {
 			$class = ClassUtils::getClassFullNameFromFile($file);
 			if ($class != null && $class != '\\' && (\class_exists($class) || \trait_exists($class))) {
 				$method = UIntrospection::getMethodAtLine($class, $line);
-				if ($callClass !== 'no class') {
+				if ($callClass !== 'no class' && \method_exists($callClass, $callFunction)) {
 					$callMethod = new \ReflectionMethod($callClass, $callFunction);
 				}
 				if ($callMethod != null) {
