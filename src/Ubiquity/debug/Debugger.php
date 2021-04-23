@@ -24,25 +24,32 @@ use Ubiquity\utils\http\UResponse;
 class Debugger {
 	const CONTEXT_VARIABLES=['globals'=>['_SESSION','_POST','_GET','_REQUEST','_SERVER','_COOKIE','_FILES','_ENV'],'toRemove'=>['e','config','sConfig']];
 	private static $variables=[];
-
+	
 	/**
 	 * Start the debugger.
 	 */
 	public static function start(int $level=E_ALL){
-		\ob_start(array(
-			__class__,
-			'_error_handler'
-		));
 		self::setErrorLevel($level);
+		if($level>0){
+			\ob_start(array(
+				__class__,
+				'_error_handler'
+			));
+			\set_exception_handler(function(\Throwable $ex){self::showException($ex);});
+		}
 	}
 	
+	/**
+	 * Set the error level (default E_ALL).
+	 * @param int $level
+	 */
 	public static function setErrorLevel(int $level=E_ALL){
 		\error_reporting($level);
 		if($level>0){
 			\ini_set('display_errors', '1');
 		}
 	}
-
+	
 	public static function _error_handler($buffer) {
 		$e = \error_get_last();
 		if ($e) {
@@ -56,7 +63,7 @@ class Debugger {
 				switch ($e['type']) {
 					case E_ERROR: case E_PARSE:case E_COMPILE_ERROR:case E_WARNING:
 						return self::getErrorFromValues($file,$line,$error,$type,'',false);
-
+						
 					default:
 						return self::wrapResponse(\str_replace($e['message'], "", $buffer).$message );
 				}
@@ -66,14 +73,14 @@ class Debugger {
 		}
 		return $buffer;
 	}
-
-	public static function showException(\Error|\Exception $e){
+	
+	public static function showException(\Throwable $e){
 		$file=$e->getFile();
 		$line=$e->getLine();
 		$traces=$e->getTrace();
 		echo self::getErrorFromValues($file,$line,$e->getMessage(),$e,self::showTraces($traces),true);
 	}
-
+	
 	private static function showTraces($traces){
 		self::$variables=[];
 		$tracesContent='';
@@ -84,9 +91,9 @@ class Debugger {
 			return self::loadView('traces', ['content' => $tracesContent,'variables'=>json_encode(self::$variables),'count'=>\count($traces)]);
 		}
 		return '';
-
+		
 	}
-
+	
 	private static function getGlobales($variables){
 		$result=[];
 		foreach (self::CONTEXT_VARIABLES['globals'] as $k){
@@ -94,42 +101,70 @@ class Debugger {
 		}
 		return $result;
 	}
-
+	
 	private static function getLocales(){
 		$variables=[];
-		$variables['Request']['controller']=Startup::getController();
-		$variables['Request']['action']=Startup::getAction();
+		$errors=[];
+		$ctrl=Startup::getController();
+		$variables['Request']['controller']=$ctrl;
+		if(!\class_exists($ctrl)) {
+			$errors['Request']['controller'] = self::errorFlag("Controller $ctrl does not exist!");
+		}
+		$action=Startup::getAction();
+		$variables['Request']['action']=$action;
+		if(!\method_exists($ctrl,$action)) {
+			$errors['Request']['action']=self::errorFlag("Method $action does not exist on Controller $ctrl!");
+		}
 		$variables['Request']['params']=Startup::getActionParams();
 		$variables['Request']['method']=URequest::getMethod();
 		$path=Framework::getUrl();
 		$variables['Request']['url']=$path;
-		$variables['Route']=Router::getRouteInfo($path);
+		$route=Router::getRouteInfo($path);
+		if($route===false){
+			$errors['Route']=self::errorFlag("No route found for the url $path",'exclamation circle orange');
+		}
+		$variables['Route']=$route;
 		$variables['Application']['cacheSystem']=Framework::getCacheSystem();
 		$variables['Application']['AnnotationsEngine']=Framework::getAnnotationsEngine();
 		$variables['Application']['applicationDir']=Startup::getApplicationDir();
 		$variables['Application']['Ubiquity-version']=Framework::getVersion();
-		return $variables;
+		$variables['config']=Startup::$config;
+		return ['variables'=>$variables,'errors'=>$errors];
+	}
+	
+	private static function displayVar($variable){
+		if(\is_object($variable)){
+			return \get_class($variable).'@'.\spl_object_hash($variable);
+		}
+		return \var_export($variable,true);
+	}
+	
+	
+	private static function errorFlag($message,$type='exclamation triangle red') {
+		return "&nbsp;<i class='ui $type icon var_error' data-content='$message'></i>";
 	}
 	
 	private static function showAllVariables(){
 		$l=self::getLocales();
 		$g=self::getGlobales($GLOBALS);
-		$locales=self::showVariables($l);
+		$locales=self::showVariables($l['variables'],$l['errors']);
 		$globales=self::showVariables($g);
 		return self::loadView('all_variables',compact('locales','globales'));
 	}
-
-	private static function showVariables($variables){
-		$keys=array_keys($variables);
+	
+	private static function showVariables($variables,$errors=[]){
+		$keys=\array_keys($variables);
 		$names='';
 		$variables_elements='';
 		foreach ($keys as $i=>$k){
 			$active='';
 			$v=$variables[$k];
 			if(\is_array($v)){
-				$ve=self::showVariable($k,$v,1);
+				$error=$errors[$k]??[];
+				$ve=self::showVariable($k,$v,$error,1);
 			}else{
-				$ve="<span class='ui label'>".\var_export($v,true)."</span>";
+				$error=$errors[$k]??'';
+				$ve="<span class='ui label'>".self::displayVar($v)."$error</span>";
 			}
 			if($i===0){
 				$first_var="<div class='variable'>$ve</div>";
@@ -140,17 +175,20 @@ class Debugger {
 		}
 		return self::loadView('menu_variables',compact('names','variables_elements','first_var'));
 	}
-
-	private static function showVariable($name,array $variables,$level=1){
+	
+	private static function showVariable($name,array $variables,array $errors=[],$level=1){
 		$values='';
 		$count=\count($variables);
 		if($count>0) {
 			foreach ($variables as $k => $v) {
 				if($v!=$variables) {
-					if (is_array($v)) {
-						$v = self::showVariable($k, $v, $level + 1);
+					
+					if (\is_array($v)) {
+						$error=$errors[$k]??[];
+						$v = self::showVariable($k, $v,$error, $level + 1);
 					} else {
-						$v = '<span class="ui label">' . var_export($v, true) . '</span>';
+						$error=$errors[$k]??'';
+						$v = '<span class="ui label">' . self::displayVar($v) . "$error</span>";
 					}
 					$values .= "<tr><td><b>$k</b></td><td>" . $v . "</td></tr>";
 				}
@@ -159,7 +197,7 @@ class Debugger {
 		}
 		return '<span class="ui label">empty</span>';
 	}
-
+	
 	private static function showTrace($trace,$index){
 		$callFunction=$trace['function']??'';
 		$callMethod=null;
@@ -178,12 +216,13 @@ class Debugger {
 				}
 				if ($callMethod != null) {
 					$code = UIntrospection::getMethodCode($method, file($trace['file']));
-
+					
 					$attributes = $callMethod->getParameters();
 					$effectiveArguments=self::getCallbackArguments($file,$line,$callFunction);
 					foreach ($attributes as $i => $param) {
+						$argValue=$args[$i] ?? '';
 						$arg=$effectiveArguments[$i]??('$'.$param->getName());
-						self::$variables[$attr]['$'.$param->getName()] = ['name'=>$effectiveArguments[$i]??'','value'=>var_export($args[$i] ?? '', true)];
+						self::$variables[$attr]['$'.$param->getName()] = ['name'=>$effectiveArguments[$i]??'','value'=>self::displayVar($argValue)];
 						$code=str_replace($arg,"<mark>$arg</mark>",$code);
 					}
 					$start = $method->getStartLine();
@@ -212,12 +251,13 @@ class Debugger {
 		}
 		return '';
 	}
-
+	
+	
 	private static function getCallbackArguments($file,$lineNumber,$callbackName){
 		$fileContent=\file($file);
 		return UIntrospection::getMethodEffectiveParameters('<?php '.$fileContent[$lineNumber-1],$callbackName);
 	}
-
+	
 	private static function getMethodParametersTable($functionName){
 		$res='';
 		if(isset(self::$variables[$functionName]) && \is_array(self::$variables[$functionName])) {
@@ -227,8 +267,10 @@ class Debugger {
 		}
 		return $res;
 	}
-
+	
 	private static function getErrorFromValues($file,$line,$errorMessage,$errorType,$traces='',$introspect=true){
+		\restore_error_handler();
+		\restore_exception_handler();
 		$code=null;
 		$vars = self::showAllVariables();
 		$controller_action=\basename($file);
@@ -252,23 +294,23 @@ class Debugger {
 		$message=self::loadView('error',['file'=>$file,'error'=>$errorMessage,'code'=>$code,'line'=>$line,'type'=>$type,'start'=>$start,'traces'=>$traces,'vars'=>$vars,'controller_action'=>$controller_action]);
 		return self::wrapResponse($message);
 	}
-
+	
 	private static function wrapResponse($content){
 		return self::getHeader().$content.self::getFooter();
 	}
-
+	
 	private static function getHeader(){
 		return '<div class="ui container">';
 	}
-
+	
 	private static function getFooter(){
 		return '</div>'.'<script type="text/javascript">'.\file_get_contents(__DIR__.'/js/loader.js').'</script>';
 	}
-
+	
 	private static function getFileContent($file){
 		return \htmlentities(\file_get_contents($file));
 	}
-
+	
 	private static function loadView($name,$data){
 		$content=\file_get_contents(__DIR__.'/views/'.$name.'.html');
 		foreach ($data as $key=>$value){
