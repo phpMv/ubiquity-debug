@@ -15,11 +15,8 @@ Update in `.ubiquity/_index.php` file:
 
 ```php
 \Ubiquity\debug\Debugger::start();
-try {
-	\Ubiquity\controllers\Startup::run($config);
-}catch(\Error|\Exception $e){
-	\Ubiquity\debug\Debugger::showException($e);
-}
+
+\Ubiquity\controllers\Startup::run($config);
 ```
 
 ## For a new project (since Ubiquity 2.4.4)
