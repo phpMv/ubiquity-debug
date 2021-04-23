@@ -12,6 +12,7 @@ use Ubiquity\utils\base\UIntrospection;
 use Ubiquity\utils\base\UString;
 use Ubiquity\utils\http\URequest;
 use Ubiquity\utils\http\UResponse;
+use Ubiquity\utils\base\UArray;
 
 /**
  * Ubiquity debug class.
@@ -135,13 +136,19 @@ class Debugger {
 		$variables['Application']['AnnotationsEngine']=Framework::getAnnotationsEngine();
 		$variables['Application']['applicationDir']=Startup::getApplicationDir();
 		$variables['Application']['Ubiquity-version']=Framework::getVersion();
-		$variables['config']=Startup::$config;
+		$variables['Config']=Startup::$config;
+		$variables['system']['php']=\phpversion();
+		$variables['system']['os']=\php_uname();
+		$variables['system']['extensions']=\implode(', ',\get_loaded_extensions());
 		return ['variables'=>$variables,'errors'=>$errors];
 	}
 	
 	private static function displayVar($variable){
+		if(!is_string($variable) && \is_callable($variable)){
+			return UIntrospection::closure_dump($variable);
+		}
 		if(\is_object($variable)){
-			return \get_class($variable).'@'.\spl_object_hash($variable);
+			return get_class($variable).'@'.\spl_object_hash($variable);
 		}
 		return \var_export($variable,true);
 	}
@@ -171,7 +178,7 @@ class Debugger {
 				$ve=self::showVariable($k,$v,$error,1);
 			}else{
 				$error=$errors[$k]??'';
-				$ve="<span class='ui label'>".self::displayVar($v)."$error</span>";
+				$ve="<span class='ui label'><pre>".self::displayVar($v)."</pre>$error</span>";
 			}
 			if($i===0){
 				$first_var="<div class='variable'>$ve</div>";
@@ -195,7 +202,7 @@ class Debugger {
 						$v = self::showVariable($k, $v,$error, $level + 1);
 					} else {
 						$error=$errors[$k]??'';
-						$v = '<span class="ui label">' . self::displayVar($v) . "$error</span>";
+						$v = '<span class="ui label"><pre>' . self::displayVar($v) . "</pre>$error</span>";
 					}
 					$values .= "<tr><td><b>$k</b></td><td>" . $v . "</td></tr>";
 				}

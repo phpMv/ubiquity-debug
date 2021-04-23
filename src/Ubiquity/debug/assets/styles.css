@@ -4,3 +4,10 @@ mark {
 	padding: 0.1em!important;
 	color: beige!important;
 }
+
+.ui.label>pre{
+	display: inline-block;
+	margin: 0;
+	white-space: pre-wrap;
+	max-width: 500px;
+}
