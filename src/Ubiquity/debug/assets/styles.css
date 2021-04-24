@@ -8,6 +8,7 @@ mark {
 .ui.label>pre{
 	display: inline-block;
 	margin: 0;
-	white-space: pre-wrap;
+	white-space: pre-line;
+	overflow-wrap: break-word;
 	max-width: 500px;
 }

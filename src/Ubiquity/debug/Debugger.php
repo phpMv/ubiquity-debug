@@ -148,7 +148,7 @@ class Debugger {
 			return UIntrospection::closure_dump($variable);
 		}
 		if(\is_object($variable)){
-			return get_class($variable).'@'.\spl_object_hash($variable);
+			return \get_class($variable).'@'.\spl_object_hash($variable);
 		}
 		return \var_export($variable,true);
 	}
