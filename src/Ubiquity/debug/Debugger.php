@@ -237,7 +237,7 @@ class Debugger {
 						$argValue=$args[$i] ?? '';
 						$arg=$effectiveArguments[$i]??('$'.$param->getName());
 						self::$variables[$attr]['$'.$param->getName()] = ['name'=>$effectiveArguments[$i]??'','value'=>self::displayVar($argValue)];
-						$code=\preg_replace('/(\W*)('.\preg_quote($arg).')(\W+)/','$1<mark>$2</mark>$3',$code);
+						$code=\preg_replace('#(\W*)('.\preg_quote($arg).')(\W+)#','$1<mark>$2</mark>$3',$code);
 					}
 					$start = $method->getStartLine();
 					$countParams = count(self::$variables[$attr] ?? []);
