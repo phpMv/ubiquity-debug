@@ -11,10 +11,15 @@ Debugger for Ubiquity framework
 composer require phpmv/ubiquity-debug
 ```
 
+If you had devtools previously installed globally, update them:
+```bash
+composer global update
+```
+
 Update in `.ubiquity/_index.php` file:
 
 ```php
-\Ubiquity\debug\Debugger::start();
+\Ubiquity\debug\Debugger::start($config);
 
 \Ubiquity\controllers\Startup::run($config);
 ```
