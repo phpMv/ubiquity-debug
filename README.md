@@ -19,7 +19,7 @@ composer global update
 Update in `.ubiquity/_index.php` file:
 
 ```php
-\Ubiquity\debug\Debugger::start($config);
+\Ubiquity\debug\Debugger::start($config);// To add
 
 \Ubiquity\controllers\Startup::run($config);
 ```
