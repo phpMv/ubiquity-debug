@@ -1,6 +1,6 @@
 mark {
-	outline: 1px solid beige!important;
-	background-color: #1f1f1f!important;
+	outline: 1px dotted gray!important;
+	background-color: #303030!important;
 	padding: 0.1em!important;
 	color: beige!important;
 }

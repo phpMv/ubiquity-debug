@@ -19,7 +19,7 @@ use Ubiquity\utils\base\UArray;
  * Ubiquity\debug$Debugger
  * This class is part of Ubiquity
  * @author jc
- * @version 1.0.0
+ * @version 1.0.1
  *
  */
 class Debugger {
@@ -237,7 +237,7 @@ class Debugger {
 						$argValue=$args[$i] ?? '';
 						$arg=$effectiveArguments[$i]??('$'.$param->getName());
 						self::$variables[$attr]['$'.$param->getName()] = ['name'=>$effectiveArguments[$i]??'','value'=>self::displayVar($argValue)];
-						$code=str_replace($arg,"<mark>$arg</mark>",$code);
+						$code=\preg_replace('/(\W*)('.\preg_quote($arg).')(\W+)/','$1<mark>$2</mark>$3',$code);
 					}
 					$start = $method->getStartLine();
 					$countParams = count(self::$variables[$attr] ?? []);

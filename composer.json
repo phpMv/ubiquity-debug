@@ -11,7 +11,7 @@
 		"php-framework"
 	],
 	"require" : {
-		"php" : ">=8.0",
+		"php" : ">=7.4",
 		"prismjs/prism": "^1.23"
 	},
 	"license" : "Apache-2.0",

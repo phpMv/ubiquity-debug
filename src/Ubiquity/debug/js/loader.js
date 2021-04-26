@@ -77,8 +77,13 @@
 
     function loadPopup(key,name,effectiveName,value){
         if (!$("#"+key +" .token").length) return setTimeout(loadPopup, 50,key,name,effectiveName,value);
-        let selector="#"+key+" mark:contains('"+(effectiveName || name )+"')";
-        $( selector ).popup({title:name,content: value});
+        let contains=effectiveName || name;
+        $("#"+key+" mark").each(function(){
+            let elm=$(this);
+            if(elm.text()===contains){
+               elm.popup({title:name,content: value});
+           }
+        });
     }
 
     function loadPrism(){
