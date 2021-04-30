@@ -172,7 +172,7 @@ class Debugger {
 		$variables_elements='';
 		foreach ($keys as $i=>$k){
 			$active='';
-			$v=$variables[$k];
+			$v=$variables[$k]??'';
 			if(\is_array($v)){
 				$error=$errors[$k]??[];
 				$ve=self::showVariable($k,$v,$error,1);
