@@ -23,7 +23,7 @@ use Ubiquity\utils\base\UArray;
  *
  */
 class Debugger {
-	const CONTEXT_VARIABLES=['globals'=>['_SESSION','_POST','_GET','_REQUEST','_SERVER','_COOKIE','_FILES','_ENV'],'toRemove'=>['e','config','sConfig']];
+	const CONTEXT_VARIABLES=['globals'=>['_SESSION','_POST','_GET','_REQUEST','_SERVER','_COOKIE','_FILES'],'toRemove'=>['e','config','sConfig']];
 	private static $variables=[];
 	
 	/**
