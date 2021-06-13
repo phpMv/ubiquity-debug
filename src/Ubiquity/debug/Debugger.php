@@ -19,7 +19,7 @@ use Ubiquity\utils\base\UArray;
  * Ubiquity\debug$Debugger
  * This class is part of Ubiquity
  * @author jc
- * @version 1.0.1
+ * @version 1.0.2
  *
  */
 class Debugger {
@@ -150,7 +150,15 @@ class Debugger {
 		if(\is_object($variable)){
 			return \get_class($variable).'@'.\spl_object_hash($variable);
 		}
-		return \var_export($variable,true);
+		if(!self::isRecursive($variable)) {
+			return \var_export($variable, true);
+		}
+		return 'Recursive array!';
+	}
+
+	private static function isRecursive($array){
+		$dump = \print_r($array, true);
+		return \strpos($dump, '*RECURSION*') !== false;
 	}
 	
 	
@@ -221,7 +229,7 @@ class Debugger {
 		$file=$trace['file'];
 		$attr=UString::cleanAttribute($callClass.".".$callFunction);
 		self::$variables[$attr]=[];
-		if($file!=null) {
+		if($file!=null && \file_exists($file)) {
 			$class = ClassUtils::getClassFullNameFromFile($file);
 			if ($class != null && $class != '\\' && (\class_exists($class) || \trait_exists($class))) {
 				$method = UIntrospection::getMethodAtLine($class, $line);
@@ -322,7 +330,10 @@ class Debugger {
 	}
 	
 	private static function getFileContent($file){
-		return \htmlentities(\file_get_contents($file));
+		if(\file_exists($file)) {
+			return \htmlentities(\file_get_contents($file));
+		}
+		return "$file not found!";
 	}
 	
 	private static function loadView($name,$data){
