@@ -226,7 +226,7 @@ class Debugger {
 		$line=$trace['line']??0;
 		$callClass=$trace['class']??'no class';
 		$args=$trace['args']??[];
-		$file=$trace['file'];
+		$file=$trace['file']??'no file';
 		$attr=UString::cleanAttribute($callClass.".".$callFunction);
 		self::$variables[$attr]=[];
 		if($file!=null && \file_exists($file)) {
