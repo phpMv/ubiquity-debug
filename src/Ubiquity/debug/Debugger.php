@@ -180,7 +180,7 @@ class Debugger {
 	}
 
 	private static function displayVar($variable) {
-		if (! \is_string($variable) && \is_callable($variable, true)) {
+		if (! \is_string($variable) && ! \is_array($variable) && \is_callable($variable)) {
 			return UIntrospection::closure_dump($variable);
 		}
 		if (\is_object($variable)) {
