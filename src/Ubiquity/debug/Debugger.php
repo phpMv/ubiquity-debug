@@ -148,23 +148,27 @@ class Debugger {
 		$errors = [];
 		$ctrl = Startup::getController();
 		$variables['Request']['controller'] = $ctrl;
-		if (! \class_exists($ctrl)) {
-			$errors['Request']['controller'] = self::errorFlag("Controller $ctrl does not exist!");
+		if (isset($ctrl)) {
+			if (! \class_exists($ctrl)) {
+				$errors['Request']['controller'] = self::errorFlag("Controller $ctrl does not exist!");
+			}
+			$action = Startup::getAction();
+			if (isset($action)) {
+				$variables['Request']['action'] = $action;
+				if (! \method_exists($ctrl, $action)) {
+					$errors['Request']['action'] = self::errorFlag("Method $action does not exist on Controller $ctrl!");
+				}
+				$variables['Request']['params'] = Startup::getActionParams();
+				$variables['Request']['method'] = URequest::getMethod();
+				$path = Framework::getUrl();
+				$variables['Request']['url'] = $path;
+				$route = Router::getRouteInfo($path);
+				if ($route === false) {
+					$errors['Route'] = self::errorFlag("No route found for the url $path", 'exclamation circle orange');
+				}
+				$variables['Route'] = $route;
+			}
 		}
-		$action = Startup::getAction();
-		$variables['Request']['action'] = $action;
-		if (! \method_exists($ctrl, $action)) {
-			$errors['Request']['action'] = self::errorFlag("Method $action does not exist on Controller $ctrl!");
-		}
-		$variables['Request']['params'] = Startup::getActionParams();
-		$variables['Request']['method'] = URequest::getMethod();
-		$path = Framework::getUrl();
-		$variables['Request']['url'] = $path;
-		$route = Router::getRouteInfo($path);
-		if ($route === false) {
-			$errors['Route'] = self::errorFlag("No route found for the url $path", 'exclamation circle orange');
-		}
-		$variables['Route'] = $route;
 		$variables['Application']['cacheSystem'] = Framework::getCacheSystem();
 		$variables['Application']['AnnotationsEngine'] = Framework::getAnnotationsEngine();
 		$variables['Application']['applicationDir'] = Startup::getApplicationDir();
