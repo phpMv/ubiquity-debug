@@ -21,7 +21,8 @@ class LiveReload {
 	 */
 	public static function start(int $port=35729):string{
 		if(!URequest::isAjax()) {
-			return '<script>document.write(\'<script src="http://\' + (location.host || \'localhost\').split(\':\')[0] +
+			$nonce=self::getNonce();
+			return '<script'.$nonce.'>document.write(\'<script'.$nonce.' src="http://\' + (location.host || \'localhost\').split(\':\')[0] +
 				\':' . $port . '/livereload.js?snipver=1"></\' + \'script>\')</script>';
 		}
 		return '';
@@ -34,6 +35,16 @@ class LiveReload {
 		$exitCode=0;
 		\exec('livereload --version', $_, $exitCode);
 		return $exitCode == 1;
+	}
+
+	private static function getNonce($name='jsUtils'){
+		if(\class_exists('\\Ubiquity\\security\\csp\\ContentSecurityManager')){
+			if (\Ubiquity\security\csp\ContentSecurityManager::hasNonce($name)){
+				$nonce=\Ubiquity\security\csp\ContentSecurityManager::getNonce($name);
+				return " nonce=\"$nonce\" ";
+			}
+		}
+		return '';
 	}
 
 }
