@@ -128,7 +128,7 @@ class Debugger {
 		if ($tracesContent != null) {
 			return self::loadView('traces', [
 				'content' => $tracesContent,
-				'variables' => json_encode(self::$variables),
+				'variables' => \json_encode(self::$variables),
 				'count' => \count($traces)
 			]);
 		}
@@ -138,7 +138,7 @@ class Debugger {
 	private static function getGlobales($variables) {
 		$result = [];
 		foreach (self::CONTEXT_VARIABLES['globals'] as $k) {
-			$result[$k] = $variables[$k];
+			$result[$k] = $variables[$k]??[];
 		}
 		return $result;
 	}
@@ -409,7 +409,7 @@ class Debugger {
 	private static function loadView($name, $data) {
 		$content = \file_get_contents(__DIR__ . '/views/' . $name . '.html');
 		foreach ($data as $key => $value) {
-			$content = str_replace('{{' . $key . '}}', $value, $content);
+			$content = \str_replace('{{' . $key . '}}', $value, $content);
 		}
 		return $content;
 	}
